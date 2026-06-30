@@ -7,6 +7,8 @@ import com.sduiBackend.api.repository.UserRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,28 +30,34 @@ public class DataFetcherServiceImpl implements DataFetcherService {
     }
 
     @Override
-    public void processLinkedList(List<Long> ids){
-        if (ids == null || ids.isEmpty()) return;
+    public Flux<UserView> processLinkedList(List<Long> ids){
+        List<UserView> res=new ArrayList<>();
+        if (ids == null || ids.isEmpty()) return Flux.empty();
         Node head=new Node(ids.get(0));
         Node current=head;
         for(int i=1;i<ids.size();i++){
             current.next=new Node(ids.get(i));
             current=current.next;
         }
-        current=head;
-        while(current!=null){
+
+        return Flux.create(sink->{
+            Node temp=head;
+
+        while(temp!=null){
             List<Long> batch=new ArrayList<>();
-            for(int i=0;i<3 && current!=null;i++){
-                batch.add(current.id);
-                current=current.next;
+            for(int i=0;i<3 && temp!=null;i++){
+                batch.add(temp.id);
+                temp=temp.next;
             }
             List<CompletableFuture<Optional<UserView>>> data=batch.stream().map(this::fetchUserById).collect(Collectors.toList());
             CompletableFuture.allOf(data.toArray(new CompletableFuture[0])).join();
             for (CompletableFuture<Optional<UserView>> u : data) {
-                u.join().ifPresent(user ->
-                        System.out.println("Name: " + user.getName())
-                );
+                u.join().ifPresent(user->sink.next(user));
             }
         }
+            sink.complete();
+        });
+
+//        return res;
     }
 }

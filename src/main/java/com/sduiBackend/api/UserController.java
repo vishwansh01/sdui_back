@@ -1,9 +1,11 @@
 package com.sduiBackend.api;
 
 import com.sduiBackend.api.interfaces.DataFetcherService;
+import com.sduiBackend.api.interfaces.UserView;
 import com.sduiBackend.api.model.Node;
 import com.sduiBackend.api.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -16,10 +18,10 @@ public class UserController {
     }
 
     @PostMapping("/users/process-list")
-    public String processUserList(@RequestBody List<Long> ids) {
+    public Flux<UserView> processUserList(@RequestBody List<Long> ids) {
         // The controller simply hands off the head of the list to the service.
         // It doesn't know about threads, batches, or repositories.
-        dataFetcher.processLinkedList(ids);
-        return "Batch processing has been triggered successfully!";
+        return dataFetcher.processLinkedList(ids);
+//        return "Batch processing has been triggered successfully!";
     }
 }
