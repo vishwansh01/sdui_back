@@ -1,33 +1,25 @@
 package com.sduiBackend.api;
 
+import com.sduiBackend.api.interfaces.DataFetcherService;
+import com.sduiBackend.api.model.Node;
 import com.sduiBackend.api.repository.UserRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class UserController {
-    private final UserRepository userRepository;
+    private final DataFetcherService dataFetcher;
 
-    public UserController(UserRepository userRepository){
-        this.userRepository=userRepository;
+    public UserController(DataFetcherService dataFetcher) {
+        this.dataFetcher = dataFetcher;
     }
 
-    @GetMapping("/users")
-    public void printUsers(@RequestParam Long id){
-//        Long dum=1L;
-        userRepository.findById(id).ifPresentOrElse(user->{
-            System.out.println("--- User Details ---");
-            System.out.println("ID: " + user.getId());
-            System.out.println("Name: " + user.getName());
-            System.out.println("Country" + user.getCountry());
-            System.out.println("State: " + user.getState());
-        },
-                ()->System.out.println("User not found with ID: " + id)
-        );
-
-//        users.forEach(user->System.out.println("user"+user.getName()));
+    @PostMapping("/users/process-list")
+    public String processUserList(@RequestBody List<Long> ids) {
+        // The controller simply hands off the head of the list to the service.
+        // It doesn't know about threads, batches, or repositories.
+        dataFetcher.processLinkedList(ids);
+        return "Batch processing has been triggered successfully!";
     }
-
-
 }
