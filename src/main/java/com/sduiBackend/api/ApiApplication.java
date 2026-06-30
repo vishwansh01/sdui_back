@@ -13,11 +13,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class ApiApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		System.out.println("Loaded DB URL: " + dotenv.get("NEON_DATABASE_URL"));
-		System.setProperty("NEON_DATABASE_URL", dotenv.get("NEON_DATABASE_URL"));
-		System.setProperty("DBUSER", dotenv.get("DBUSER"));
-		System.setProperty("PASSWORD", dotenv.get("PASSWORD"));
+//		Dotenv dotenv = Dotenv.load();
+//		System.out.println("Loaded DB URL: " + dotenv.get("NEON_DATABASE_URL"));
+//		System.setProperty("NEON_DATABASE_URL", dotenv.get("NEON_DATABASE_URL"));
+//		System.setProperty("DBUSER", dotenv.get("DBUSER"));
+//		System.setProperty("PASSWORD", dotenv.get("PASSWORD"));
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
